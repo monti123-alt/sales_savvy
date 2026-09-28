@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { extractError } from '../api/axios'
 import { portalPaths } from '../utils/portalPaths'
@@ -67,6 +67,7 @@ export function RoleChooser() {
 export function Login({ accountType }) {
   const { login, logout } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
   const isAdmin = accountType === 'ADMIN'
   const paths = portalPaths(isAdmin)
 
@@ -106,6 +107,7 @@ export function Login({ accountType }) {
       sub={isAdmin ? 'Sign in to manage your SalesSavvy store' : 'Sign in to your SalesSavvy customer space'}
     >
       {error && <div className="fk-alert">⚠️ <span>{error}</span></div>}
+      {location.state?.notice && <div className="fk-alert fk-alert-ok" role="status">{location.state.notice}</div>}
 
       <form onSubmit={handleSubmit} className="form-gap">
         <label className="form-group">

@@ -10,6 +10,7 @@ export function portalPaths(isAdmin) {
       orders: '/admin/orders',
       newOrder: '/admin/orders/new',
       order: (id) => `/admin/orders/${id}`,
+      security: '/admin/security',
       cart: '/admin/cart',
       myOrders: '/admin/orders',
       assistant: '/admin/assistant',

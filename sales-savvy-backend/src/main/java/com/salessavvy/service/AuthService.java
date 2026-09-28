@@ -2,6 +2,7 @@ package com.salessavvy.service;
 
 import com.salessavvy.config.JwtUtil;
 import com.salessavvy.dto.AuthResponse;
+import com.salessavvy.dto.ChangePasswordRequest;
 import com.salessavvy.dto.LoginRequest;
 import com.salessavvy.dto.RegisterRequest;
 import com.salessavvy.entity.Role;
@@ -11,6 +12,8 @@ import com.salessavvy.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.nio.charset.StandardCharsets;
 
 @Service
 public class AuthService {
@@ -49,7 +52,8 @@ public class AuthService {
         User saved = userRepository.save(user);
 
         // Issue a token immediately so the user is logged in after registering
-        String token = jwtUtil.generateToken(saved.getId(), saved.getEmail(), saved.getRole().name());
+        String token = jwtUtil.generateToken(saved.getId(), saved.getEmail(), saved.getRole().name(),
+                saved.getTokenVersion());
         return AuthResponse.from(saved, token);
     }
 
@@ -65,7 +69,32 @@ public class AuthService {
             throw new CustomException("Invalid email or password");
         }
 
-        String token = jwtUtil.generateToken(user.getId(), user.getEmail(), user.getRole().name());
+        String token = jwtUtil.generateToken(user.getId(), user.getEmail(), user.getRole().name(),
+                user.getTokenVersion());
         return AuthResponse.from(user, token);
+    }
+
+    @Transactional
+    public void changePassword(User authenticatedUser, ChangePasswordRequest request) {
+        User user = userRepository.findById(authenticatedUser.getId())
+                .filter(User::isEnabled)
+                .orElseThrow(() -> new CustomException("Account is unavailable"));
+
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new CustomException("Current password is incorrect");
+        }
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new CustomException("New password and confirmation do not match");
+        }
+        if (request.getNewPassword().getBytes(StandardCharsets.UTF_8).length > 72) {
+            throw new CustomException("New password must be at most 72 UTF-8 bytes");
+        }
+        if (passwordEncoder.matches(request.getNewPassword(), user.getPassword())) {
+            throw new CustomException("New password must be different from the current password");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setTokenVersion(user.getTokenVersion() + 1);
+        userRepository.save(user);
     }
 }

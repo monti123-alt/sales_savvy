@@ -32,6 +32,11 @@ export function AuthProvider({ children }) {
     return data
   }
 
+  async function changePassword(currentPassword, newPassword, confirmPassword) {
+    await api.put('/auth/password', { currentPassword, newPassword, confirmPassword })
+    logout()
+  }
+
   function logout() {
     localStorage.removeItem('ss_token')
     localStorage.removeItem('ss_user')
@@ -39,7 +44,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, login, register, changePassword, logout }}>
       {children}
     </AuthContext.Provider>
   )

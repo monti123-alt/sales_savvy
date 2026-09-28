@@ -50,11 +50,12 @@ public class JwtUtil {
      * Build a token for a user.
      * The claims (payload) are the readable facts about the user.
      */
-    public String generateToken(Long userId, String email, String role) {
+    public String generateToken(Long userId, String email, String role, long tokenVersion) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("email", email);
         claims.put("role", role);
+        claims.put("tokenVersion", tokenVersion);
 
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expirationMs);

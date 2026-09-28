@@ -13,6 +13,7 @@ import OrderDetails from './pages/OrderDetails'
 import Cart from './pages/Cart'
 import MyOrders from './pages/MyOrders'
 import Assistant from './pages/Assistant'
+import ChangePassword from './pages/ChangePassword'
 import { useAuth } from './context/AuthContext'
 
 function PortalRedirect() {
@@ -45,6 +46,7 @@ export default function App() {
       <Route path="/admin/orders" element={<ProtectedRoute requireRole="ADMIN"><Orders /></ProtectedRoute>} />
       <Route path="/admin/orders/new" element={<ProtectedRoute requireRole="ADMIN"><OrderForm /></ProtectedRoute>} />
       <Route path="/admin/orders/:id" element={<ProtectedRoute requireRole="ADMIN"><OrderDetails /></ProtectedRoute>} />
+      <Route path="/admin/security" element={<ProtectedRoute requireRole="ADMIN"><ChangePassword /></ProtectedRoute>} />
 
       <Route path="/shop" element={<ProtectedRoute requireRole="USER"><Navigate to="/shop/products" replace /></ProtectedRoute>} />
       <Route path="/shop/products" element={<ProtectedRoute requireRole="USER"><Products /></ProtectedRoute>} />

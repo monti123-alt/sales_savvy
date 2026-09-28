@@ -3,13 +3,16 @@ package com.salessavvy.controller;
 import com.salessavvy.config.JwtUtil;
 import com.salessavvy.dto.ApiResponse;
 import com.salessavvy.dto.AuthResponse;
+import com.salessavvy.dto.ChangePasswordRequest;
 import com.salessavvy.dto.LoginRequest;
 import com.salessavvy.dto.RegisterRequest;
+import com.salessavvy.entity.User;
 import com.salessavvy.service.AuthService;
 import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedHashMap;
@@ -39,6 +42,14 @@ public class AuthController {
     public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest request) {
         AuthResponse response = authService.login(request);
         return ResponseEntity.ok(ApiResponse.ok("Login successful", response));
+    }
+
+    @PutMapping("/api/auth/password")
+    public ResponseEntity<ApiResponse<Void>> changePassword(
+            @Valid @RequestBody ChangePasswordRequest request,
+            @AuthenticationPrincipal User authenticatedUser) {
+        authService.changePassword(authenticatedUser, request);
+        return ResponseEntity.ok(ApiResponse.ok("Password changed successfully", null));
     }
 
     // ---------- WHO AM I : GET /api/auth/me (token required) ----------

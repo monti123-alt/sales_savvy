@@ -58,12 +58,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 Long userId = jwtUtil.getUserIdFromToken(token);
                 String email = claims.get("email", String.class);
                 String role = claims.get("role", String.class);
+                Number tokenVersion = claims.get("tokenVersion", Number.class);
 
                 // 3. Make sure the user still exists and is enabled in the database.
                 //    Without this check, a deleted user's token would keep working
                 //    until it expires.
                 userRepository.findById(userId)
-                        .filter(user -> user.isEnabled() && user.getEmail().equals(email))
+                        .filter(user -> user.isEnabled()
+                                && user.getEmail().equals(email)
+                                && user.getTokenVersion() == (tokenVersion == null ? 0 : tokenVersion.longValue()))
                         .ifPresent(user -> {
                             // 4. Tell Spring Security who this request is from.
                             //    ROLE_ prefix is Spring's convention for authorities.

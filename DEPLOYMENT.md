@@ -40,3 +40,11 @@ The repository must be pushed to GitHub before connecting either host.
 The frontend sends API calls and product-image requests to the configured API
 origin. Keep all private credentials in Railway variables; never put them in
 Vercel's `VITE_` variables or commit a local `.env` file.
+
+## Rotating the administrator password
+
+After signing in, open **Account security** in the admin sidebar to change the
+administrator password. Use a new, unique password of at least 12 characters.
+Changing a password invalidates all existing access tokens for that account.
+`ADMIN_PASSWORD` is only used to bootstrap an admin when the database has no
+users; changing that Railway variable does not reset an existing account.

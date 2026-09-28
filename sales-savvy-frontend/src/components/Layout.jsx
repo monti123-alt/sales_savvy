@@ -166,6 +166,14 @@ export function Sidebar() {
             <span className="side-icon">🛒</span>
             <span>Create order</span>
           </NavLink>
+          <NavLink
+            to={paths.security}
+            onClick={() => setOpen(false)}
+            className="side-link"
+          >
+            <span className="side-icon">🔒</span>
+            <span>Account security</span>
+          </NavLink>
         </div>}
       </aside>
     </>
