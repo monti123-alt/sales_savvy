@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import api, { extractError } from '../api/axios'
+import api, { extractError, resolveApiUrl } from '../api/axios'
 import { ErrorAlert, Layout, Loading } from '../components/Layout'
 import { portalPaths } from '../utils/portalPaths'
 
@@ -50,7 +50,7 @@ export default function ProductForm() {
           price: p.price ?? '',
           stockQuantity: p.stockQuantity ?? '',
         })
-        setImagePreview(p.imageUrl ?? '')
+        setImagePreview(resolveApiUrl(p.imageUrl ?? ''))
       } catch (err) {
         setError(extractError(err))
       } finally {

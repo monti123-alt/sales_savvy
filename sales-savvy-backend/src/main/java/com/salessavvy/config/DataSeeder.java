@@ -4,6 +4,7 @@ import com.salessavvy.entity.*;
 import com.salessavvy.repository.CustomerRepository;
 import com.salessavvy.repository.ProductRepository;
 import com.salessavvy.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,20 +26,39 @@ public class DataSeeder {
     public CommandLineRunner seedData(UserRepository userRepository,
                                       CustomerRepository customerRepository,
                                       ProductRepository productRepository,
-                                      PasswordEncoder passwordEncoder) {
+                                      PasswordEncoder passwordEncoder,
+                                      @Value("${app.seed-demo-data:true}") boolean seedDemoData,
+                                      @Value("${app.admin.email:}") String adminEmail,
+                                      @Value("${app.admin.password:}") String adminPassword,
+                                      @Value("${app.jwt.secret:}") String jwtSecret) {
         return args -> {
+            if (!seedDemoData && jwtSecret.length() < 32) {
+                throw new IllegalStateException("Set JWT_SECRET to a random value of at least 32 characters in production");
+            }
 
             // ---- 1. A default login ----
             if (userRepository.count() == 0) {
-                User admin = new User("Admin User", "admin@salessavvy.com",
-                        passwordEncoder.encode("admin123"), Role.ADMIN);
-                userRepository.save(admin);
+                if (seedDemoData) {
+                    User admin = new User("Admin User", "admin@salessavvy.com",
+                            passwordEncoder.encode("admin123"), Role.ADMIN);
+                    userRepository.save(admin);
 
-                User user = new User("Sales Rep", "user@salessavvy.com",
-                        passwordEncoder.encode("user123"), Role.USER);
-                userRepository.save(user);
-                System.out.println(">>> Seeded users: admin@salessavvy.com / admin123");
+                    User user = new User("Sales Rep", "user@salessavvy.com",
+                            passwordEncoder.encode("user123"), Role.USER);
+                    userRepository.save(user);
+                    System.out.println(">>> Seeded demo admin and customer accounts");
+                } else {
+                    if (adminEmail.isBlank() || adminPassword.length() < 12) {
+                        throw new IllegalStateException(
+                                "Set ADMIN_EMAIL and an ADMIN_PASSWORD of at least 12 characters when demo data is disabled");
+                    }
+                    userRepository.save(new User("Store Admin", adminEmail.trim(),
+                            passwordEncoder.encode(adminPassword), Role.ADMIN));
+                    System.out.println(">>> Created the configured store admin account");
+                }
             }
+
+            if (!seedDemoData) return;
 
             // ---- 2. Demo customers ----
             if (customerRepository.count() == 0) {

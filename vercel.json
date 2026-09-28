@@ -1,0 +1,11 @@
+{
+  "installCommand": "npm --prefix sales-savvy-frontend ci",
+  "buildCommand": "npm --prefix sales-savvy-frontend run build",
+  "outputDirectory": "sales-savvy-frontend/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

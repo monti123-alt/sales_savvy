@@ -1,12 +1,20 @@
 import axios from 'axios'
 
+const apiOrigin = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '')
+export const apiBaseUrl = apiOrigin ? `${apiOrigin}/api` : '/api'
+
 // One axios instance for the whole app.
 const api = axios.create({
   // Requests go to /api/... on the same host, and Vite's proxy forwards
   // them to Spring Boot on port 8080.
-  baseURL: '/api',
+  baseURL: apiBaseUrl,
   headers: { 'Content-Type': 'application/json' },
 })
+
+export function resolveApiUrl(url) {
+  if (!url || !apiOrigin || !url.startsWith('/')) return url
+  return `${apiOrigin}${url}`
+}
 
 // A request interceptor runs BEFORE every request.
 // We attach the JWT token so the backend can identify the user.

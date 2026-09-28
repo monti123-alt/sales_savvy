@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import api, { extractError } from '../api/axios'
+import api, { extractError, resolveApiUrl } from '../api/axios'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 import { portalPaths } from '../utils/portalPaths'
@@ -144,7 +144,7 @@ export default function Products() {
             <article className="fk-prod" key={p.id}>
               <div className="fk-prod-img">
                 {p.imageUrl
-                  ? <img src={p.imageUrl} alt={p.name} loading="lazy" />
+                  ? <img src={resolveApiUrl(p.imageUrl)} alt={p.name} loading="lazy" />
                   : <span>{CATEGORY_ICON[p.category] || DEFAULT_ICON}</span>}
               </div>
 
