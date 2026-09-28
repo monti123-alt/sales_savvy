@@ -1,0 +1,22 @@
+# Credentials and local configuration
+**/.env
+**/.env.*
+!.env.example
+
+# Dependencies and build output
+**/node_modules/
+**/target/
+**/dist/
+**/build/
+**/uploads/
+**/.vite/
+
+# Local runtimes, logs, and editor files
+/node-v*/
+/apache-maven-*/
+*.log
+**/.idea/
+**/.vscode/
+*.iml
+.DS_Store
+Thumbs.db
