@@ -14,8 +14,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * Puts a few demo rows into the database the first time the app starts,
- * so the dashboard and Postman have something to show.
+ * Optionally seeds sample customer and product rows for local development.
+ * Login accounts are never created with shared demo credentials.
  *
  * Each block is guarded by a count check, so re-running never duplicates data.
  */
@@ -36,25 +36,32 @@ public class DataSeeder {
                 throw new IllegalStateException("Set JWT_SECRET to a random value of at least 32 characters in production");
             }
 
-            // ---- 1. A default login ----
-            if (userRepository.count() == 0) {
-                if (seedDemoData) {
-                    User admin = new User("Admin User", "admin@salessavvy.com",
-                            passwordEncoder.encode("admin123"), Role.ADMIN);
-                    userRepository.save(admin);
+            boolean hasAdminConfiguration = !adminEmail.isBlank() || !adminPassword.isBlank();
+            if (hasAdminConfiguration && (adminEmail.isBlank() || adminPassword.length() < 8)) {
+                throw new IllegalStateException(
+                        "Set both ADMIN_EMAIL and an ADMIN_PASSWORD of at least 8 characters");
+            }
 
-                    User user = new User("Sales Rep", "user@salessavvy.com",
-                            passwordEncoder.encode("user123"), Role.USER);
-                    userRepository.save(user);
-                    System.out.println(">>> Seeded demo admin and customer accounts");
-                } else {
-                    if (adminEmail.isBlank() || adminPassword.length() < 12) {
+            disableLegacyDemoAccount(userRepository, "user@salessavvy.com");
+            disableLegacyDemoAccount(userRepository, "admin@salessavvy.com");
+
+            if (!userRepository.existsByRoleAndEnabledTrue(Role.ADMIN)) {
+                if (!hasAdminConfiguration) {
+                    if (!seedDemoData) {
                         throw new IllegalStateException(
-                                "Set ADMIN_EMAIL and an ADMIN_PASSWORD of at least 12 characters when demo data is disabled");
+                                "Set ADMIN_EMAIL and an ADMIN_PASSWORD of at least 8 characters to create the first admin");
                     }
-                    userRepository.save(new User("Store Admin", adminEmail.trim(),
-                            passwordEncoder.encode(adminPassword), Role.ADMIN));
-                    System.out.println(">>> Created the configured store admin account");
+                } else {
+                    User admin = userRepository.findByEmail(adminEmail.trim())
+                            .orElseGet(() -> new User("Store Admin", adminEmail.trim(), "", Role.ADMIN));
+                    if (admin.getRole() != Role.ADMIN) {
+                        throw new IllegalStateException("ADMIN_EMAIL already belongs to a non-admin account");
+                    }
+                    admin.setPassword(passwordEncoder.encode(adminPassword));
+                    admin.setEnabled(true);
+                    admin.setTokenVersion(admin.getTokenVersion() + 1);
+                    userRepository.save(admin);
+                    System.out.println(">>> Created or updated the configured store admin account");
                 }
             }
 
@@ -148,6 +155,15 @@ public class DataSeeder {
                 System.out.println(">>> Added " + productsToAdd.size() + " additional catalog products");
             }
         };
+    }
+
+    private void disableLegacyDemoAccount(UserRepository userRepository, String email) {
+        userRepository.findByEmail(email).filter(User::isEnabled).ifPresent(user -> {
+            user.setEnabled(false);
+            user.setTokenVersion(user.getTokenVersion() + 1);
+            userRepository.save(user);
+            System.out.println(">>> Disabled a legacy demo login account");
+        });
     }
 
     private Product newProduct(String name, String sku, String category,

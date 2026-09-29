@@ -95,11 +95,6 @@ export function Login({ accountType }) {
     }
   }
 
-  function fillDemo() {
-    setEmail(isAdmin ? 'admin@salessavvy.com' : 'user@salessavvy.com')
-    setPassword(isAdmin ? 'admin123' : 'user123')
-  }
-
   return (
     <AuthShell
       tone={isAdmin ? 'admin' : 'customer'}
@@ -141,10 +136,6 @@ export function Login({ accountType }) {
         </button>
       </form>
 
-      <button className="btn btn-ghost btn-block" onClick={fillDemo}>
-        Use demo {isAdmin ? 'admin' : 'customer'} credentials
-      </button>
-
       <div className="auth-foot">
         {isAdmin
           ? <>Customer account? <Link to="/customer/login">Sign in to the shop</Link></>
@@ -176,7 +167,10 @@ export function Register() {
     setBusy(true)
     try {
       await register(form.name, form.email, form.password)
-      navigate(portalPaths(false).home)
+      navigate(portalPaths(false).login, {
+        replace: true,
+        state: { notice: 'Account created successfully. You can now sign in with your email address and password.' },
+      })
     } catch (err) {
       setError(extractError(err))
     } finally {

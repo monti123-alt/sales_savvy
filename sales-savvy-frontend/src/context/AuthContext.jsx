@@ -25,11 +25,7 @@ export function AuthProvider({ children }) {
 
   async function register(name, email, password) {
     const res = await api.post('/auth/register', { name, email, password })
-    const data = res.data.data
-    localStorage.setItem('ss_token', data.token)
-    localStorage.setItem('ss_user', JSON.stringify(data))
-    setUser(data)
-    return data
+    return res.data.data
   }
 
   async function changePassword(currentPassword, newPassword, confirmPassword) {

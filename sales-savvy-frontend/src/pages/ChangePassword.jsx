@@ -42,7 +42,7 @@ export default function ChangePassword() {
       <section className="fk-card" style={{ maxWidth: 620 }}>
         <h2 className="fk-card-title">Change your password</h2>
         <p className="page-sub" style={{ marginBottom: 20 }}>
-          Choose a new password of at least 12 characters. Changing it signs out all sessions for this account.
+          Choose a new password of at least 8 characters. Changing it signs out all sessions for this account.
         </p>
         {error && <div className="fk-alert" role="alert">⚠️ <span>{error}</span></div>}
         <form className="form-gap" onSubmit={handleSubmit}>
@@ -65,7 +65,7 @@ export default function ChangePassword() {
               name="newPassword"
               type="password"
               autoComplete="new-password"
-              minLength={12}
+              minLength={8}
               maxLength={72}
               value={form.newPassword}
               onChange={updateField}
@@ -79,7 +79,7 @@ export default function ChangePassword() {
               name="confirmPassword"
               type="password"
               autoComplete="new-password"
-              minLength={12}
+              minLength={8}
               maxLength={72}
               value={form.confirmPassword}
               onChange={updateField}

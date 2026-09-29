@@ -1,5 +1,6 @@
 package com.salessavvy.repository;
 
+import com.salessavvy.entity.Role;
 import com.salessavvy.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -16,4 +17,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmailAndEnabledTrue(String email);
 
     boolean existsByEmail(String email);
+
+    boolean existsByRoleAndEnabledTrue(Role role);
 }

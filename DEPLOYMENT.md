@@ -18,7 +18,7 @@ The repository must be pushed to GitHub before connecting either host.
    | `JWT_SECRET` | A unique random secret of at least 32 characters |
    | `SEED_DEMO_DATA` | `false` |
    | `ADMIN_EMAIL` | The store administrator's email |
-   | `ADMIN_PASSWORD` | A strong password of at least 12 characters |
+   | `ADMIN_PASSWORD` | A strong password of at least 8 characters |
    | `SALESSAVVY_UPLOAD_DIR` | `/data/uploads` |
 
    Add optional integration secrets such as `OPENAI_API_KEY` and
@@ -44,7 +44,9 @@ Vercel's `VITE_` variables or commit a local `.env` file.
 ## Rotating the administrator password
 
 After signing in, open **Account security** in the admin sidebar to change the
-administrator password. Use a new, unique password of at least 12 characters.
+administrator password. Use a new, unique password of at least 8 characters.
 Changing a password invalidates all existing access tokens for that account.
-`ADMIN_PASSWORD` is only used to bootstrap an admin when the database has no
-users; changing that Railway variable does not reset an existing account.
+On startup, the API disables the old shared demo customer and admin logins if
+they exist in the database. `ADMIN_EMAIL` and `ADMIN_PASSWORD` create or update
+the administrator only when the database has no enabled admin; changing those
+Railway variables does not reset an existing administrator account.
